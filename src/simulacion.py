@@ -1,13 +1,22 @@
 import pandas as pd
 import numpy as np
+import os
 
-def generar_datos_simulados(n=100):
-    np.random.seed(42)
-    
-    datos = pd.DataFrame({
-        "anio": np.random.choice(range(2020, 2031), n),
-        "capacidad_renovable": np.random.normal(5000, 1000, n),
-        "emisiones_co2": np.random.normal(200, 50, n)
-    })
-    
-    return datos
+# Crear carpetas si no existen
+os.makedirs('datos', exist_ok=True)
+os.makedirs('resultados', exist_ok=True)
+
+# Generar 100 días de datos de red con "ruido"
+np.random.seed(42)
+df = pd.DataFrame({
+    'fecha': pd.date_range(start='2024-01-01', periods=100),
+    'generacion_termica_gwh': np.random.uniform(30, 50, 100),
+    'generacion_renovable_gwh': np.random.uniform(80, 120, 100)
+})
+
+# Meter errores a propósito para que el script de limpieza trabaje
+df.iloc[0, 1] = np.nan 
+df.iloc[5, 2] = -99.9
+
+df.to_csv('datos/datos_red_crudos.csv', index=False)
+print("✅ Datos crudos generados en datos/datos_red_crudos.csv")
